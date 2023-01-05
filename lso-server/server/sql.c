@@ -58,7 +58,8 @@ bool login(User *u1, MYSQL *conn, MYSQL_RES *res, MYSQL_ROW row) {
     conn = start_connection(conn);
     u1 = send_query_select(conn, res, row, u1);
     close_connection(conn, res);
-    if (res != NULL) {
+    
+    if (u1 != NULL) {
         return true;
     } else {
         return false;
@@ -70,5 +71,7 @@ bool registration(User *u1, MYSQL *conn, MYSQL_RES *res, MYSQL_ROW row) {
     res = send_query_insert(conn, res, row, u1);
     close_connection(conn, res);
     
-    return true;
+   return true;
 }
+
+

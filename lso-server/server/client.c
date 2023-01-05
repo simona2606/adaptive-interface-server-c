@@ -58,23 +58,33 @@ void *handle_client(void *arg) {
 
                 } else {
                     
-                    if(client->user.flag[0] == 'r' && registration(&client->user, conn, res, row)) {
-                        printf("\nSuccessfully registered %s\n", client->user.username);
+                    if(client->user.flag[0] == 'c') {
+                    	flag_login = login(&client->user, conn, res, row);
+                    	if(flag_login == 1) {
+                           sprintf(buff_out, "\nAccessibility %s \n", client->user.accessibility);
+                           send_message(buff_out, client->uid);
+                           string_format(buff_out, strlen(buff_out));
+                    	}
+                    	
+                    } 
+                    if (client->user.flag[0] == 'r' && registration(&client->user, conn, res, row)) {
+                    	printf("\nSuccessfully registered %s\n", client->user.username);
                         sprintf(buff_out, "\nSuccessfully registered %s\n", client->user.username);
-                    		
-                    	send_message(buff_out, client->uid);
-                                
+                        send_message(buff_out, client->uid);
                         string_format(buff_out, strlen(buff_out));
-                              
+                        
                     } else if(client->user.flag[0] == 'l') {
                         flag_login = login(&client->user, conn, res, row);
-                                
-  				        printf("\nSuccessfully logged with accessibility %s\n", client->user.accessibility);
-                        sprintf(buff_out, "\nSuccessfully logged with accessibility %s\n", client->user.accessibility);
-                                
+                        
+                        if(flag_login == 1) {
+                           sprintf(buff_out, "\nSuccessfully logged with accessibility %s\n", client->user.accessibility);
+                        } else {
+                           sprintf(buff_out, "\nError, data are not valid!\n");
+                        }        
                     	send_message(buff_out, client->uid);
                         string_format(buff_out, strlen(buff_out));
                     } else {
+                    	
                         perror("ERROR: Registration Failed!!!");
                     }
                 }       

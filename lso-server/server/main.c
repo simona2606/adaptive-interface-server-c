@@ -16,7 +16,6 @@
 
 static int uid = 10;
 
-
 int main(int argc, char **argv) {
     MYSQL *conn;
     MYSQL_RES *res;
