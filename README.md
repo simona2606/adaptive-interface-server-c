@@ -55,3 +55,52 @@ void send_message(char *s, int uid) {
     pthread_mutex_unlock(&clients_mutex); 
 }
 ```
+
+Regarding the insertion and retrieval of user data within the database, special functions containing SQL queries have been created. Before each query it is necessary to initiate a connection with the database and at the end of each query it is necessary to close this connection to avoid "range-out-of-index" problems.
+Below is an example of a user login function:
+```
+MYSQL *start_connection(MYSQL *conn) { 
+    char *server = "localhost";
+    char *user = "root";
+    char *password = "my-secret-password"; 
+    char *database = "Accessibility";
+    conn = mysql_init(NULL);
+    if (!mysql_real_connect(conn, server, user, password, database, 0, NULL, 0)) { 
+        fprintf(stderr, "%s\n", mysql_error(conn));
+        exit(1);
+    }
+    return conn; 
+}
+
+void close_connection(MYSQL *conn, MYSQL_RES *res) { 
+    mysql_free_result(res);
+    mysql_close(conn);
+}
+```
+
+```
+User *send_query_select(MYSQL *conn, MYSQL_RES *res, MYSQL_ROW row, User *u1) { 
+    char query_select[200];
+    sprintf(query_select, "select access from user where username='%s'", u1->username);
+    if (mysql_query(conn, query_select)) { 
+        fprintf(stderr, "%s\n", mysql_error(conn)); 
+        exit(1);
+    }
+    res = mysql_use_result(conn);
+    while ((row = mysql_fetch_row(res)) != NULL) {
+        strcpy(u1->accessibility, row[0]); 
+    }
+    return u1; 
+}
+
+bool login(User *u1, MYSQL *conn, MYSQL_RES *res, MYSQL_ROW row) { 
+    conn = start_connection(conn);
+    u1 = send_query_select(conn, res, row, u1);
+    close_connection(conn, res);
+    if (u1 != NULL) { 
+        return true;
+    } else {
+        return false;
+    } 
+}
+```
